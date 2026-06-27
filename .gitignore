@@ -1,6 +1,7 @@
 node_modules
 out
 dist
+build
 .vscode-test
 *.vsix
 vsc-extension-quickstart.md

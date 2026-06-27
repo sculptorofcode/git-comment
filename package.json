@@ -2,8 +2,9 @@
   "name": "git-comment",
   "displayName": "Git Comment",
   "description": "AI-generated Git commit messages for multiple AI providers.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "saikat-hq",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/sculptorofcode/git-comment"
@@ -142,7 +143,9 @@
     "watch": "node esbuild.js --watch",
     "package": "node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out"
+    "watch-tests": "tsc -p . -w --outDir out",
+    "build": "npx @vscode/vsce package -o build/",
+    "publish": "npx @vscode/vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",

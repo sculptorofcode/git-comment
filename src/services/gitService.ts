@@ -137,6 +137,32 @@ export class GitService {
     }
 
     /**
+     * Checks if a file is a binary file by extension and null byte check.
+     */
+    private isBinaryFile(filePath: string): boolean {
+        const fs = require('fs');
+        const binaryExtensions = /\.(png|jpg|jpeg|gif|webp|ico|pdf|zip|gz|tar|tgz|bz2|7z|rar|exe|dll|so|dylib|bin|woff|woff2|ttf|eot)$/i;
+        if (binaryExtensions.test(filePath)) {
+            return true;
+        }
+
+        try {
+            const buffer = Buffer.alloc(1024);
+            const fd = fs.openSync(filePath, 'r');
+            const bytesRead = fs.readSync(fd, buffer, 0, 1024, 0);
+            fs.closeSync(fd);
+            for (let i = 0; i < bytesRead; i++) {
+                if (buffer[i] === 0) {
+                    return true;
+                }
+            }
+            return false;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
      * Returns the diff of changes. Prioritizes staged changes if present, otherwise returns unstaged changes diff.
      * @param repository The Git repository.
      */
@@ -195,11 +221,16 @@ export class GitService {
                             const filePath = change.uri.fsPath;
                             const stats = fs.statSync(filePath);
                             if (stats.isFile()) {
-                                const content = fs.readFileSync(filePath, 'utf8');
                                 const relPath = vscode.workspace.asRelativePath(change.uri);
-                                untrackedDiff += `\n--- /dev/null\n+++ b/${relPath}\n@@ -0,0 +1,${content.split('\n').length} @@\n`;
-                                untrackedDiff += content.split('\n').map((line: string) => `+${line}`).join('\n') + '\n';
-                                GitService.log(`Added untracked file to diff: ${relPath}`);
+                                if (this.isBinaryFile(filePath)) {
+                                    untrackedDiff += `\nBinary files /dev/null and b/${relPath} differ\n`;
+                                    GitService.log(`Skipped reading binary file content for diff: ${relPath}`);
+                                } else {
+                                    const content = fs.readFileSync(filePath, 'utf8');
+                                    untrackedDiff += `\n--- /dev/null\n+++ b/${relPath}\n@@ -0,0 +1,${content.split('\n').length} @@\n`;
+                                    untrackedDiff += content.split('\n').map((line: string) => `+${line}`).join('\n') + '\n';
+                                    GitService.log(`Added untracked file to diff: ${relPath}`);
+                                }
                             }
                         } catch (e: any) {
                             GitService.log(`Failed to read untracked file ${change.uri.fsPath}: ${e.message}`);
