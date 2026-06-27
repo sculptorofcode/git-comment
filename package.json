@@ -2,7 +2,7 @@
   "name": "git-comment",
   "displayName": "Git Comment",
   "description": "AI-generated Git commit messages for multiple AI providers.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "saikat-hq",
   "icon": "icon.png",
   "repository": {

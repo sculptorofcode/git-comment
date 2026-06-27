@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1
+## 0.1.2
 
 - Added a custom logo icon for the extension.
 - Fixed a bug where binary files/images (e.g., untracked images) were read as text during diff collection, causing excessive token counts and API status 400 errors.
