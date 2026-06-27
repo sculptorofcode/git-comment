@@ -1,0 +1,153 @@
+{
+  "name": "git-comment",
+  "displayName": "Git Comment",
+  "description": "AI-generated Git commit messages for multiple AI providers.",
+  "version": "0.1.0",
+  "publisher": "git-comment",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sculptorofcode/git-comment"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Source Control"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "git-comment.generateCommitMessage",
+        "title": "Git Comment: Generate Commit Message",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "git-comment.setApiKey",
+        "title": "Git Comment: Set API Key"
+      },
+      {
+        "command": "git-comment.deleteApiKey",
+        "title": "Git Comment: Delete API Key"
+      },
+      {
+        "command": "git-comment.configureExtension",
+        "title": "Git Comment: Settings"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "git-comment.generateCommitMessage",
+          "group": "navigation",
+          "when": "scmProvider == git"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "git-comment.generateCommitMessage",
+          "when": "scmProvider == git"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Git Comment",
+      "properties": {
+        "git-comment.provider": {
+          "type": "string",
+          "default": "gemini",
+          "enum": [
+            "gemini",
+            "openai",
+            "anthropic",
+            "groq",
+            "deepseek",
+            "ollama",
+            "openrouter"
+          ],
+          "enumDescriptions": [
+            "Google Gemini AI API",
+            "OpenAI API",
+            "Anthropic Claude API",
+            "Groq API",
+            "DeepSeek API",
+            "Ollama (Local LLM API)",
+            "OpenRouter API"
+          ],
+          "description": "The AI provider to use for generating commit messages."
+        },
+        "git-comment.promptTemplate": {
+          "type": "string",
+          "default": "",
+          "description": "Custom prompt template. Leave empty to use the default template. Use {{diff}} as a placeholder for the git staged diff."
+        },
+        "git-comment.useConventionalCommits": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce Conventional Commits specification (e.g. feat: add feature, fix: resolve bug)."
+        },
+        "git-comment.openai.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "The model to use when OpenAI provider is selected."
+        },
+        "git-comment.openai.baseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "Custom API base URL for OpenAI-compatible providers."
+        },
+        "git-comment.gemini.model": {
+          "type": "string",
+          "default": "gemini-1.5-flash",
+          "description": "The model to use when Google Gemini provider is selected."
+        },
+        "git-comment.anthropic.model": {
+          "type": "string",
+          "default": "claude-3-5-sonnet-latest",
+          "description": "The model to use when Anthropic provider is selected."
+        },
+        "git-comment.groq.model": {
+          "type": "string",
+          "default": "llama-3.1-70b-versatile",
+          "description": "The model to use when Groq provider is selected."
+        },
+        "git-comment.deepseek.model": {
+          "type": "string",
+          "default": "deepseek-coder",
+          "description": "The model to use when DeepSeek provider is selected."
+        },
+        "git-comment.ollama.model": {
+          "type": "string",
+          "default": "codellama",
+          "description": "The model to use when Ollama provider is selected."
+        },
+        "git-comment.ollama.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:11434/v1",
+          "description": "The base URL for the Ollama API (OpenAI-compatible)."
+        },
+        "git-comment.openrouter.model": {
+          "type": "string",
+          "default": "google/gemini-2.5-flash",
+          "description": "The model to use when OpenRouter provider is selected."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "bun run package",
+    "compile": "tsc -p ./",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "esbuild": "^0.21.0"
+  }
+}

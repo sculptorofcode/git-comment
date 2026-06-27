@@ -1,0 +1,9 @@
+node_modules
+out
+dist
+.vscode-test
+*.vsix
+vsc-extension-quickstart.md
+.DS_Store
+.env
+.vscode
