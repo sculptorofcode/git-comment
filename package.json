@@ -3,7 +3,7 @@
   "displayName": "Git Comment",
   "description": "AI-generated Git commit messages for multiple AI providers.",
   "version": "0.1.0",
-  "publisher": "git-comment",
+  "publisher": "saikat-hq",
   "repository": {
     "type": "git",
     "url": "https://github.com/sculptorofcode/git-comment"
@@ -13,7 +13,7 @@
   },
   "categories": [
     "Machine Learning",
-    "Source Control"
+    "SCM Providers"
   ],
   "main": "./dist/extension.js",
   "activationEvents": [],
