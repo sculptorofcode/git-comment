@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fix Gemini status 503 errors and optimize large git diffs.
+
 ## 0.1.2
 
 - Added a custom logo icon for the extension.

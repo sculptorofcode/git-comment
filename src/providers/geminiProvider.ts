@@ -38,7 +38,7 @@ export class GeminiProvider extends BaseProvider {
             if (signal) {
                 requestInit.signal = signal;
             }
-            const response = await fetch(url, requestInit);
+            const response = await this.fetchWithRetry(url, requestInit);
 
             if (!response.ok) {
                 const errText = await response.text();

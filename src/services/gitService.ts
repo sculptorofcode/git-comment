@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { GitExtension, API, Repository } from '../git';
+import { GitExtension, API, Repository, Change } from '../git';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 
@@ -166,7 +166,7 @@ export class GitService {
      * Returns the diff of changes. Prioritizes staged changes if present, otherwise returns unstaged changes diff.
      * @param repository The Git repository.
      */
-    public async getDiff(repository: Repository): Promise<{ diff: string; isStaged: boolean }> {
+    public async getDiff(repository: Repository): Promise<{ diff: string; isStaged: boolean; isDiffTooLarge?: boolean }> {
         GitService.log(`Starting getDiff. rootPath: ${repository.rootUri.fsPath}`);
         GitService.log(`Staged changes: ${repository.state.indexChanges.length}, Unstaged changes: ${repository.state.workingTreeChanges.length}, Untracked changes: ${repository.state.untrackedChanges.length}`);
         
@@ -254,7 +254,41 @@ Fallback Error: ${fallbackError || 'none'}`;
                 throw new Error(details);
             }
 
-            return { diff, isStaged };
+            let isDiffTooLarge = false;
+            const DIFF_LIMIT = 20000;
+            if (diff.length > DIFF_LIMIT) {
+                isDiffTooLarge = true;
+                const originalLength = diff.length;
+                
+                // Construct fallback file list
+                const formatChangesList = (changes: Change[]): string => {
+                    return changes.map(c => {
+                        const statusLabel = getStatusLabel(c.status);
+                        const relPath = vscode.workspace.asRelativePath(c.uri);
+                        return `- ${statusLabel}: ${relPath}`;
+                    }).join('\n');
+                };
+
+                let fileList = '';
+                if (isStaged) {
+                    fileList = formatChangesList(repository.state.indexChanges);
+                } else {
+                    fileList = [
+                        ...repository.state.indexChanges,
+                        ...repository.state.workingTreeChanges,
+                        ...repository.state.untrackedChanges
+                    ].map(c => {
+                        const statusLabel = getStatusLabel(c.status);
+                        const relPath = vscode.workspace.asRelativePath(c.uri);
+                        return `- ${statusLabel}: ${relPath}`;
+                    }).join('\n');
+                }
+
+                diff = `(Note: The git diff is too large (${originalLength} characters) to send. Showing the list of changed files instead.)\n\nList of Changed Files:\n${fileList}`;
+                GitService.log(`Diff too large (${originalLength} chars). Fallback to file list: ${fileList.length} chars.`);
+            }
+
+            return { diff, isStaged, isDiffTooLarge };
         } catch (error: any) {
             GitService.log(`getDiff Error: ${error.message}`);
             throw error;
@@ -268,5 +302,22 @@ Fallback Error: ${fallbackError || 'none'}`;
      */
     public setCommitMessage(repository: Repository, message: string): void {
         repository.inputBox.value = message;
+    }
+}
+
+function getStatusLabel(status: number): string {
+    switch (status) {
+        case 1: return 'modified';
+        case 2: return 'added';
+        case 3: return 'deleted';
+        case 4: return 'renamed';
+        case 5: return 'copied';
+        case 6: return 'modified';
+        case 7: return 'added';
+        case 8: return 'deleted';
+        case 9: return 'renamed';
+        case 10: return 'copied';
+        case 11: return 'added';
+        default: return 'modified';
     }
 }

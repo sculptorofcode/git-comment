@@ -73,9 +73,12 @@ export function activate(context: vscode.ExtensionContext) {
                         abortController.abort();
                     });
 
-                    const { diff, isStaged: _isStaged } = await gitService.getDiff(repo);
+                    const { diff, isStaged: _isStaged, isDiffTooLarge } = await gitService.getDiff(repo);
                     if (!diff || diff.trim().length === 0) {
                         throw new Error('No changes found in the diff. If you only have untracked (new) files, please stage them first so Git can process them.');
+                    }
+                    if (isDiffTooLarge) {
+                        vscode.window.showInformationMessage('Git Comment: Diff is too large. Generating commit message from changed file list instead.');
                     }
                     const prompt = PromptEngine.buildPrompt(diff, config);
                     const provider = ProviderFactory.createProvider(config, apiKey);

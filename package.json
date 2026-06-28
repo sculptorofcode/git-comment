@@ -2,7 +2,7 @@
   "name": "git-comment",
   "displayName": "Git Comment",
   "description": "AI-generated Git commit messages for multiple AI providers.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "saikat-hq",
   "icon": "icon.png",
   "repository": {
@@ -145,7 +145,8 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "build": "npx @vscode/vsce package -o build/",
-    "publish": "npx @vscode/vsce publish"
+    "publish": "npx @vscode/vsce publish",
+    "release": "node scripts/release.js"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",
